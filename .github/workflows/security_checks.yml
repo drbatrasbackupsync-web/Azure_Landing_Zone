@@ -1,0 +1,79 @@
+name: "Terraform Security & Code Quality CI"
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+jobs:
+  terraform-formatting-and-validation:
+    name: "1. Format & Validate Check"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.0
+
+      - name: Check Terraform Formatting
+        run: terraform fmt -check -recursive
+
+      - name: Validate Preprod Environment
+        run: |
+          cd environments/preprod
+          terraform init -backend=false
+          terraform validate
+
+      - name: Validate Prod Environment
+        run: |
+          cd environments/prod
+          terraform init -backend=false
+          terraform validate
+
+  tflint-analysis:
+    name: "2. TFLint Analysis"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: latest
+
+      - name: Init & Run TFLint (Preprod)
+        run: |
+          cd environments/preprod
+          tflint --init || true
+          tflint
+
+      - name: Init & Run TFLint (Prod)
+        run: |
+          cd environments/prod
+          tflint --init || true
+          tflint
+
+  security-static-analysis:
+    name: "3. IaC Security Scan (TFSec / Trivy)"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Run TFSec Security Scan
+        uses: aquasecurity/tfsec-action@v1.0.3
+        with:
+          working_directory: .
+          soft_fail: false
+
+      - name: Run Checkov Security Scan
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: .
+          framework: terraform
+          soft_fail: true # Set to false to block PR on critical security violations
