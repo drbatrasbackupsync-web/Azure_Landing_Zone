@@ -1,0 +1,21 @@
+environment         = "preprod"
+location            = "Central India"
+zone                = "1"
+resource_group_name = "preprod-rg"
+vnet_address_space  = ["10.200.0.0/16"]
+
+subnet_prefixes = {
+  vm    = ["10.200.1.0/24"]
+  appgw = ["10.200.2.0/24"]
+  lb    = ["10.200.3.0/24"]
+}
+
+admin_username = "preprodadmin"
+admin_password = "<YOUR_PREPROD_VM_PASSWORD>"
+vm_size        = "Standard_B1s"
+
+tags = {
+  Environment = "Preprod"
+  ManagedBy   = "Terraform"
+  Project     = "AzureLandingZone"
+}

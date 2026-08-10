@@ -1,0 +1,21 @@
+environment         = "prod"
+location            = "Central India"
+zone                = "1"
+resource_group_name = "prod-rg"
+vnet_address_space  = ["10.100.0.0/16"]
+
+subnet_prefixes = {
+  vm    = ["10.100.1.0/24"]
+  appgw = ["10.100.2.0/24"]
+  lb    = ["10.100.3.0/24"]
+}
+
+admin_username = "prodadmin"
+admin_password = "P@ssw0rdProd2026!KeyVault"
+vm_size        = "Standard_B1s"
+
+tags = {
+  Environment = "Prod"
+  ManagedBy   = "Terraform"
+  Project     = "AzureLandingZone"
+}
