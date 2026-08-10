@@ -49,3 +49,10 @@ variable "tags" {
   description = "Resource tags"
   default     = {}
 }
+
+variable "backend_ip_addresses" {
+  type        = list(string)
+  description = "List of IP addresses for Application Gateway backend pool"
+  default     = []
+}
+

@@ -74,6 +74,7 @@ module "keyvault" {
   location            = module.resource_group.location
   resource_group_name = module.resource_group.resource_group_name
   tenant_id           = data.azurerm_client_config.current.tenant_id
+  object_id           = data.azurerm_client_config.current.object_id
   tags                = var.tags
 }
 
@@ -148,6 +149,21 @@ module "app_gateway" {
   resource_group_name  = module.resource_group.resource_group_name
   subnet_id            = module.subnet_appgw.subnet_id
   public_ip_address_id = module.pip_appgw.pip_id
+  backend_ip_addresses = [module.nic.private_ip_address]
   zones                = [var.zone]
   tags                 = var.tags
 }
+
+# 11. Subnet NSG Association
+resource "azurerm_subnet_network_security_group_association" "vm_subnet_nsg" {
+  subnet_id                 = module.subnet_vm.subnet_id
+  network_security_group_id = module.nsg.nsg_id
+}
+
+# 12. NIC LB Backend Address Pool Association
+resource "azurerm_network_interface_backend_address_pool_association" "nic_lb_bap" {
+  network_interface_id    = module.nic.nic_id
+  ip_configuration_name   = "internal"
+  backend_address_pool_id = module.loadbalancer.backend_address_pool_id
+}
+

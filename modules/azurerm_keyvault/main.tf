@@ -9,5 +9,18 @@ resource "azurerm_key_vault" "kv" {
 
   sku_name = var.sku_name
 
+  dynamic "access_policy" {
+    for_each = var.object_id != null ? [var.object_id] : []
+    content {
+      tenant_id = var.tenant_id
+      object_id = access_policy.value
+
+      secret_permissions = [
+        "Get", "List", "Set", "Delete", "Purge", "Recover"
+      ]
+    }
+  }
+
   tags = var.tags
 }
+

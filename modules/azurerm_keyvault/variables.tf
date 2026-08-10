@@ -28,3 +28,10 @@ variable "tags" {
   description = "Resource tags"
   default     = {}
 }
+
+variable "object_id" {
+  type        = string
+  description = "Optional Object ID for Key Vault access policy"
+  default     = null
+}
+

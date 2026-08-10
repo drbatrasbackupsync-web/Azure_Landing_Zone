@@ -32,8 +32,10 @@ resource "azurerm_application_gateway" "appgw" {
   }
 
   backend_address_pool {
-    name = "backend-pool"
+    name         = "backend-pool"
+    ip_addresses = var.backend_ip_addresses
   }
+
 
   backend_http_settings {
     name                  = "http-setting"
